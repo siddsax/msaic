@@ -1,4 +1,5 @@
 import re
+import io
 
 #Initialize Global variables 
 GloveEmbeddings = {}
@@ -9,7 +10,7 @@ emb_dim = 50
 def loadEmbeddings(embeddingfile):
     global GloveEmbeddings,emb_dim
 
-    fe = open(embeddingfile,"r",encoding="utf-8",errors="ignore")
+    fe = io.open(embeddingfile,"r",encoding="utf-8",errors="ignore")
     for line in fe:
         tokens= line.strip().split()
         word = tokens[0]
@@ -24,8 +25,8 @@ def loadEmbeddings(embeddingfile):
 def TextDataToCTF(inputfile,outputfile,isEvaluation):
     global GloveEmbeddings,emb_dim,max_query_words,max_passage_words
 
-    f = open(inputfile,"r",encoding="utf-8",errors="ignore")  # Format of the file : query_id \t query \t passage \t label \t passage_id
-    fw = open(outputfile,"w",encoding="utf-8")
+    f = io.open(inputfile,"r",encoding="utf-8",errors="ignore")  # Format of the file : query_id \t query \t passage \t label \t passage_id
+    fw = io.open(outputfile,"w",encoding="utf-8")
     for line in f:
         tokens = line.strip().lower().split("\t")
         query_id,query,passage,label = tokens[0],tokens[1],tokens[2],tokens[3]

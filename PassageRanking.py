@@ -1,6 +1,7 @@
 ﻿from __future__ import print_function
 import numpy as np
 import sys
+import io
 import os
 import cntk as C
 from cntk.io import MinibatchSource, CTFDeserializer, StreamDef, StreamDefs, INFINITELY_REPEAT, FULL_DATA_SWEEP
@@ -22,7 +23,7 @@ emb_dim=50
 ## The following LoadValidationSet method reads ctf format validation file and creates query, passage feature vectors and also copies labels for each pair.
 ## the created vectors will be useful to find metrics on validation set after training each epoch which will be useful to decide the best model 
 def LoadValidationSet(validationfile):
-    f = open(validationfile,'r',encoding="utf-8")
+    f = io.open(validationfile,'r',encoding="utf-8")
     for line in f:
         tokens = line.strip().split("|")  
         #tokens[0] will be empty token since the line is starting with |
@@ -139,7 +140,7 @@ def TrainAndValidate(trainfile):
 def GetPredictionOnEvalSet(model,testfile,submissionfile):
     global q_max_words,p_max_words,emb_dim
 
-    f = open(testfile,'r',encoding="utf-8")
+    f = io.open(testfile,'r',encoding="utf-8")
     all_scores={} # Dictionary with key = query_id and value = array of scores for respective passages
     for line in f:
         tokens = line.strip().split("|")  
@@ -156,7 +157,7 @@ def GetPredictionOnEvalSet(model,testfile,submissionfile):
             all_scores[query_id].append(score)
         else:
             all_scores[query_id] = [score]
-    fw = open(submissionfile,"w",encoding="utf-8")
+    fw = io.open(submissionfile,"w",encoding="utf-8")
     for query_id in all_scores:
         scores = all_scores[query_id]
         scores_str = [str(sc) for sc in scores] # convert all scores to string values
