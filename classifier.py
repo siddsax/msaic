@@ -21,26 +21,37 @@ class classifier1(nn.Module):
         self.maxPB2 = nn.MaxPool2d((2,2), (2, 2))
         self.denseB1 = nn.Linear(18, 4)
 
-        self.denseAB = nn.Linear(4, 1)
+        self.denseAB = nn.Linear(4, 2)
+
+        ############ INIT WEIGHTS ############
+        torch.nn.init.xavier_uniform_(self.convA1.weight)
+        torch.nn.init.xavier_uniform_(self.convA2.weight)
+        torch.nn.init.xavier_uniform_(self.denseA1.weight)
+
+        torch.nn.init.xavier_uniform_(self.convB1.weight)
+        torch.nn.init.xavier_uniform_(self.convB2.weight)
+        torch.nn.init.xavier_uniform_(self.denseB1.weight)
+
+        torch.nn.init.xavier_uniform_(self.denseAB.weight)
 
     def forward(self, queryfeatures, passagefeatures):
-        x1 = F.tanh(self.convA1(queryfeatures))
-        x1 = F.tanh(self.maxPA1(x1))
-        x1 = F.tanh(self.convA2(x1))
-        x1 = F.tanh(self.maxPA2(x1))
+        x1 = torch.tanh(self.convA1(queryfeatures))
+        x1 = torch.tanh(self.maxPA1(x1))
+        x1 = torch.tanh(self.convA2(x1))
+        x1 = torch.tanh(self.maxPA2(x1))
         x1 = x1.view(x1.shape[0], -1)
-        x1 = F.tanh(self.denseA1(x1))
+        x1 = torch.tanh(self.denseA1(x1))
 
-        x2 = F.tanh(self.convB1(passagefeatures))
-        x2 = F.tanh(self.maxPB1(x2))
-        x2 = F.tanh(self.convB2(x2))
-        x2 = F.tanh(self.maxPB2(x2))
+        x2 = torch.tanh(self.convB1(passagefeatures))
+        x2 = torch.tanh(self.maxPB1(x2))
+        x2 = torch.tanh(self.convB2(x2))
+        x2 = torch.tanh(self.maxPB2(x2))
         x2 = x2.view(x2.shape[0], -1)
-        x2 = F.tanh(self.denseB1(x2))
+        x2 = torch.tanh(self.denseB1(x2))
 
         # x = torch.cat((x1, x2), dim=-1)
         x = x1*x2
         x = self.denseAB(x)
 
-        return F.sigmoid(x)
+        return torch.softmax(x, -1)
 

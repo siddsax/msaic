@@ -8,29 +8,41 @@ import torch.nn.functional as F
 import torch.optim as optim
 from getData import *
 from classifier import *
-
+import numpy as np
 
 def trainModel(model, optim, trainData, valData, args):
 
     #*****Hyper-Parameters******
     query_total_dim = args.q_max_words*args.emb_dim
-    # label_total_dim = num_classes
     passage_total_dim = args.p_max_words*args.emb_dim
 
     for epoch in range(args.total_epochs):
         print("Epoch : ",epoch)
         n = 0.0
         k = 0.0
-        for (pf, qf, lbl) in trainData:
-            pf, lbl, qf = pf.type(torch.FloatTensor), lbl.type(torch.FloatTensor), qf.type(torch.FloatTensor)
+        for i, (pf, qf, lbl) in enumerate(trainData):
+            # print("b")
+            if torch.cuda.is_available():
+                pf, lbl, qf = pf.type(torch.cuda.FloatTensor), lbl.type(torch.cuda.FloatTensor), qf.type(torch.cuda.FloatTensor)
+            else:
+                pf, lbl, qf = pf.type(torch.FloatTensor), lbl.type(torch.FloatTensor), qf.type(torch.FloatTensor)
             output = model(qf, pf)
-            loss = args.loss(output, lbl)
+            loss = args.loss(output.squeeze(), lbl.squeeze())
             loss.backward()
             optim.step()
             optim.zero_grad()
-            n += np.sum(np.equal(np.ceil(output.data.cpu().numpy()), lbl.data.cpu().numpy().reshape(-1, 1)))
-            # import pdb; pdb.set_trace()
-            k += 1*args.batchSize
+            # import pdb
+            # pdb.set_trace()
+            bc = 1.0*np.sum(np.equal(np.argmax(output.squeeze().data.cpu().numpy(), axis=1), np.argmax(lbl.squeeze().data.cpu().numpy(), axis=1)))
+            if i % 10 == 0:
+                #if i > 1000:
+                #    import pdb
+                #    pdb.set_trace()
+                # if loss.data.cpu().numpy() < 0:
+                print("Batch {}/{}; Correct in Batch {}; Loss {}".format(i, len(trainData), bc/args.batchSize, loss.data.cpu().numpy()))
+            n += bc
+            k += 1.0*args.batchSize
+            # print("a")
         print(n/(k*args.batchSize))
 
     # ********* Model configuration *******
