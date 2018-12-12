@@ -16,7 +16,7 @@ if __name__ == "__main__":
     parser.add_argument('--qm', dest='q_max_words', type=int, default=12)
     parser.add_argument('--pm', dest='p_max_words', type=int, default=50)
     parser.add_argument('--e', dest='emb_dim', type=int, default=50)
-    parser.add_argument('--mb', dest='batchSize', type=int, default=50)
+    parser.add_argument('--mb', dest='batchSize', type=int, default=2)
     parser.add_argument('--es', dest='epoch_size', type=int, default=100000)
     parser.add_argument('--ep', dest='total_epochs', type=int, default=200)
 
@@ -58,7 +58,7 @@ if __name__ == "__main__":
                 batch_size=args.batchSize, shuffle=True)
 
     model = classifier1()
-    optim = optim.Adam(model.parameters(), lr = 0.001)
+    optim = optim.Adam(model.parameters(), lr = 0.03)
     if torch.cuda.is_available():
         print("======== Using GPU =============")
         model = model.cuda()

@@ -4,14 +4,25 @@ from torch.utils import data
 import numpy as np
 import subprocess
 
-def toNpy(arr):
-    arr = arr.split(' ')
-    out = []
+def toNpy(arrs):
+    arrs = arrs.split('|')
+
+    arr = arrs[0].split(' ')
+    qf = []
     for i in arr:
         if len(i)> 0:
-            out.append(float(i))
+            qf.append(float(i))
 
-    return np.array(out)
+    arr = arrs[1].split(' ')
+    pf = []
+    for i in arr:
+        if len(i)> 0:
+            pf.append(float(i))
+
+    Id = np.zeros((1, 2))
+    Id[0, int(arrs[2])] = 1
+
+    return np.array(pf), np.array(qf), Id
 
 class Dataset(data.Dataset):
 #   'Characterizes a dataset for PyTorch'
@@ -24,7 +35,7 @@ class Dataset(data.Dataset):
             self.num_lines = 524190
             self.eval = True
         elif dataName == "TrainData":
-            self.num_lines = 4717690
+            self.num_lines = 4717690#45#1194000#4717690
             self.eval = False
         else:
             self.num_lines = 104170
@@ -39,32 +50,33 @@ class Dataset(data.Dataset):
 
     def __getitem__(self, index):
             'Generates one sample of data'
-            f = 'data/' + self.dataName + '/PF_' + str(index//1000) + '.0.txt'
+            f = 'data/' + self.dataName + '/data_' + str(index//1000) + '.txt'
             with open(f) as f1:
                 for i, line in enumerate(f1):
                     if i == index%1000:
-                        pf = toNpy(line)
+                        pf, qf, Id = toNpy(line)
                         break
-
-            f = 'data/' + self.dataName + '/QF_' + str(index//1000) + '.0.txt'
-            with open(f) as f1:
-                for i, line in enumerate(f1):
-                    if i == index%1000:
-                        qf = toNpy(line)
-                        break
-            if self.eval:
-                f = 'data/' + self.dataName + '/Id_' + str(index//1000) + '.0.txt'
-            else:
-                f = 'data/' + self.dataName + '/Lbl_' + str(index//1000) + '.0.txt'
+            #print(pf.shape, qf.shape, Id.shape)
+            #exit() 
+            #f = 'data/' + self.dataName + '/QF_' + str(index//1000) + '.0.txt'
+            #with open(f) as f1:
+            #    for i, line in enumerate(f1):
+            #        if i == index%1000:
+            #            qf = toNpy(line)
+            #            break
+            #if self.eval:
+            #    f = 'data/' + self.dataName + '/Id_' + str(index//1000) + '.0.txt'
+            #else:
+            #    f = 'data/' + self.dataName + '/Lbl_' + str(index//1000) + '.0.txt'
             
-            with open(f) as f1:
-                for i, line in enumerate(f1):
-                    if i == index%1000:
-                        Id = np.zeros((1, 2))
-                        Id[0, int(line)] = 1
+            #with open(f) as f1:
+            #    for i, line in enumerate(f1):
+            #        if i == index%1000:
+            #            Id = np.zeros((1, 2))
+            #            Id[0, int(line)] = 1
                         # if Id != 0 and Id != 1 and self.eval == 0:
                         #     import pdb;pdb.set_trace()
-                        break
+            #            break
 
             return pf.reshape(1, -1, self.embSize), qf.reshape(1, -1, self.embSize), Id
 

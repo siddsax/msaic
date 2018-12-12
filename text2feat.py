@@ -40,9 +40,9 @@ def TextDataToCTF(inputfile,outputfile,isEvaluation):
     global GloveEmbeddings,emb_dim,max_query_words,max_passage_words
 
     f = io.open(inputfile,"r",encoding="utf-8",errors="ignore")  # Format of the file : query_id \t query \t passage \t label \t passage_id
-    outputfile = 'data/' + outputfile + '_'
-    # if not os.path.exists(outputfile):
-    #     os.makedirs(outputfile)
+    outputfile = 'data/' + outputfile# + '_'
+    if not os.path.exists(outputfile):
+         os.makedirs(outputfile)
     # outputfile += '/'
     # f1 = open(outputfile + "QF.txt","w")#,encoding="utf-8")
     # f2 = open(outputfile + "PF.txt","w")#,encoding="utf-8")
@@ -60,39 +60,14 @@ def TextDataToCTF(inputfile,outputfile,isEvaluation):
 
     num_lines = 1000
     for ind, line in enumerate(f):
-        # with h5py.File(outputfile, 'w') as h5f:
 
         if ind%1000 == 0:
             print(ind)
             try:
-                h5f.close()
+                f1.close()
             except:
                 print("Initiating")
-            h5f = h5py.File(outputfile + str(ind//1000) + ".h5", 'w')
-            dset1 = h5f.create_dataset('qf',
-                                   shape=(num_lines, emb_dim*max_query_words),
-                                   compression=None,
-                                   dtype='float32')
-            dset2 = h5f.create_dataset('pf',
-                                    shape=(num_lines,emb_dim*max_passage_words),
-                                    compression=None,
-                                    dtype='float32')
-            if(not isEvaluation):
-                dset3 = h5f.create_dataset('Lbl',
-                                        shape=(num_lines,),
-                                        compression=None,
-                                        dtype='int32')
-            else:
-                dset3 = h5f.create_dataset('Id',
-                                        shape=(num_lines,),
-                                        compression=None,
-                                        dtype='int32')
-        #     f1 = open(outputfile + "QF_" + str(ind/1000) + ".txt","w")#,encoding="utf-8")
-        #     f2 = open(outputfile + "PF_"+ str(ind/1000) + ".txt","w")#,encoding="utf-8")
-        #     if(not isEvaluation):
-        #         f3 = open(outputfile + "Lbl_"+ str(ind/1000) + ".txt","w")#,encoding="utf-8")
-        #     else:
-        #         f3 = open(outputfile + "Id_"+ str(ind/1000) + ".txt","w")#,encoding="utf-8")
+            f1 = open(outputfile + "/data_" + str(ind/1000) + ".txt","w")#,encoding="utf-8")
 
         tokens = line.strip().lower().split("\t")
         query_id,query,passage,label = tokens[0],tokens[1],tokens[2],tokens[3]
@@ -131,31 +106,13 @@ def TextDataToCTF(inputfile,outputfile,isEvaluation):
                 passage_feature_vector += GloveEmbeddings["zerovec"]+" "  #Add zerovec for OOV terms
         passage_feature_vector = passage_feature_vector.strip() 
 
-        #convert label
-        # label_str = " 1 0 " if label=="0" else " 0 1 " 
-        # import pdb
-        # pdb.set_trace()
         if(not isEvaluation):
-            dset1[ind%num_lines] = toNpy(query_feature_vector)
-            dset2[ind%num_lines] = toNpy(passage_feature_vector)
-            dset3[ind%num_lines] = int(label)
             if int(label) != 0 and int(label) != 1:
                 import pdb
                 pdb.set_trace()
-            # f1.write(query_feature_vector + "\n")
-            # f2.write(passage_feature_vector + "\n")
-            # f3.write(label + "\n")
-        # else:
-            dset1[ind%num_lines] = toNpy(query_feature_vector)
-            dset2[ind%num_lines] = toNpy(passage_feature_vector)
-            dset3[ind%num_lines] = int(query_id)
-            # f1.write(query_feature_vector + "\n")
-            # f2.write(passage_feature_vector + "\n")
-            # f3.write(query_id + "\n")
-
-    # with h5py.File(outputfile, 'r') as h5f:
-    #     print(h5f['qf'].shape)
-    #     print(h5f['pf'].shape)
+            f1.write(query_feature_vector + "|" + passage_feature_vector + "|" + label + '\n')
+        else:
+            f1.write(query_feature_vector + "|" + passage_feature_vector + "|" + query_id + '\n')
 
 if __name__ == "__main__":
 

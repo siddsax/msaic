@@ -27,19 +27,22 @@ def trainModel(model, optim, trainData, valData, args):
             else:
                 pf, lbl, qf = pf.type(torch.FloatTensor), lbl.type(torch.FloatTensor), qf.type(torch.FloatTensor)
             output = model(qf, pf)
-            loss = args.loss(output.squeeze(), lbl.squeeze())
+            #import pdb;pdb.set_trace()
+            loss = F.binary_cross_entropy(output.squeeze(), lbl.squeeze())
             loss.backward()
             optim.step()
             optim.zero_grad()
             # import pdb
             # pdb.set_trace()
             bc = 1.0*np.sum(np.equal(np.argmax(output.squeeze().data.cpu().numpy(), axis=1), np.argmax(lbl.squeeze().data.cpu().numpy(), axis=1)))
+            kk = 1 - (1.0*np.sum(np.argmax(lbl.squeeze().data.cpu().numpy(), axis=1)))/(output.shape[0])
+            #import pdb;pdb.set_trace()
             if i % 10 == 0:
                 #if i > 1000:
                 #    import pdb
                 #    pdb.set_trace()
                 # if loss.data.cpu().numpy() < 0:
-                print("Batch {}/{}; Correct in Batch {}; Loss {}".format(i, len(trainData), bc/args.batchSize, loss.data.cpu().numpy()))
+                print("Batch {}/{}; Correct in Batch {}; Loss {} AllZ {}".format(i, len(trainData), bc/args.batchSize, loss.data.cpu().numpy(), bc/args.batchSize - kk))
             n += bc
             k += 1.0*args.batchSize
             # print("a")
