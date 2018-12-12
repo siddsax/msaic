@@ -16,7 +16,7 @@ if __name__ == "__main__":
     parser.add_argument('--qm', dest='q_max_words', type=int, default=12)
     parser.add_argument('--pm', dest='p_max_words', type=int, default=50)
     parser.add_argument('--e', dest='emb_dim', type=int, default=50)
-    parser.add_argument('--mb', dest='batchSize', type=int, default=2)
+    parser.add_argument('--mb', dest='batchSize', type=int, default=250)
     parser.add_argument('--es', dest='epoch_size', type=int, default=100000)
     parser.add_argument('--ep', dest='total_epochs', type=int, default=200)
 

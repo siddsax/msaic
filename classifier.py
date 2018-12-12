@@ -53,5 +53,5 @@ class classifier1(nn.Module):
         x = x1*x2
         x = self.denseAB(x)
 
-        return torch.softmax(x, -1)
+        return torch.nn.functional.softmax(x, -1)
 

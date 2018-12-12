@@ -116,8 +116,8 @@ def TextDataToCTF(inputfile,outputfile,isEvaluation):
 
 if __name__ == "__main__":
 
-    trainFileName = "data/traindata.tsv"
-    validationFileName = "data/validationdata.tsv"
+    trainFileName = "data/train.tsv"
+    validationFileName = "data/validation.tsv"
     EvaluationFileName = "data/eval1_unlabelled.tsv"
 
     embeddingFileName = "glove/glove.6B.50d.txt"

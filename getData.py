@@ -35,7 +35,7 @@ class Dataset(data.Dataset):
             self.num_lines = 524190
             self.eval = True
         elif dataName == "TrainData":
-            self.num_lines = 4717690#45#1194000#4717690
+            self.num_lines = 3238000#4717690#45#1194000#4717690
             self.eval = False
         else:
             self.num_lines = 104170
@@ -51,11 +51,19 @@ class Dataset(data.Dataset):
     def __getitem__(self, index):
             'Generates one sample of data'
             f = 'data/' + self.dataName + '/data_' + str(index//1000) + '.txt'
+            fg = 0
             with open(f) as f1:
                 for i, line in enumerate(f1):
                     if i == index%1000:
                         pf, qf, Id = toNpy(line)
+                        fg = 1
                         break
+            if fg == 0:
+                   with open(f) as f1:
+                      for i, line in enumerate(f1):
+                         pf, qf, Id = toNpy(line)
+                         print(index)
+                         break
             #print(pf.shape, qf.shape, Id.shape)
             #exit() 
             #f = 'data/' + self.dataName + '/QF_' + str(index//1000) + '.0.txt'
@@ -77,7 +85,7 @@ class Dataset(data.Dataset):
                         # if Id != 0 and Id != 1 and self.eval == 0:
                         #     import pdb;pdb.set_trace()
             #            break
-
+            
             return pf.reshape(1, -1, self.embSize), qf.reshape(1, -1, self.embSize), Id
 
 # # kk = Dataset('TrainData', 50).__getitem__(0)

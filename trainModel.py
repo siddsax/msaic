@@ -17,9 +17,9 @@ def trainModel(model, optim, trainData, valData, args):
     passage_total_dim = args.p_max_words*args.emb_dim
 
     for epoch in range(args.total_epochs):
-        print("Epoch : ",epoch)
-        n = 0.0
-        k = 0.0
+       
+      
+     
         for i, (pf, qf, lbl) in enumerate(trainData):
             # print("b")
             if torch.cuda.is_available():
@@ -42,11 +42,11 @@ def trainModel(model, optim, trainData, valData, args):
                 #    import pdb
                 #    pdb.set_trace()
                 # if loss.data.cpu().numpy() < 0:
-                print("Batch {}/{}; Correct in Batch {}; Loss {} AllZ {}".format(i, len(trainData), bc/args.batchSize, loss.data.cpu().numpy(), bc/args.batchSize - kk))
-            n += bc
-            k += 1.0*args.batchSize
-            # print("a")
-        print(n/(k*args.batchSize))
+                print("Epoch: {}/{}; Batch {}/{}; Correct in Batch {}; Loss {} AllZ {}".format(epoch, args.total_epochs, i, len(trainData), bc/args.batchSize, loss.data.cpu().numpy(), bc/args.batchSize - kk))
+      
+       
+     
+        
 
     # ********* Model configuration *******
     # model_output = cnn_network(query_input_var, passage_input_var, num_classes)
